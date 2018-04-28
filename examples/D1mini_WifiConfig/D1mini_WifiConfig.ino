@@ -11,8 +11,12 @@ unsigned long previousMillis = 0;
 char ssid[50];      
 char pass[50];
 
-const char *ssidConf = "tutorial";
-const char *passConf = "12345678";
+char ssidConf[50];      
+char passConf[50];
+char confstat[50];
+
+const char *ssidInit = "tutorial";
+const char *passInit = "12345678";
 
 String mensaje = "";
 
@@ -26,10 +30,18 @@ String pagina = "<!DOCTYPE html>"
 "<body>"
 "</form>"
 "<form action='guardar_conf' method='get'>"
-"SSID:<br><br>"
+"<h1>Accés internet</h1>"
+"Deixar en blanc per mantenir els valors<br><br>"
+"SSID:  "
 "<input class='input1' name='ssid' type='text'><br>"
-"PASSWORD:<br><br>"
+"PASSWORD:  "
 "<input class='input1' name='pass' type='password'><br><br>"
+"<h1>Servidor configuració</h1>"
+"Deixar en blanc per mantenir els valors<br><br>"
+"SSIDConf:  "
+"<input class='input1' name='ssidConf' type='text'><br>"
+"PASSWORDConf:  "
+"<input class='input1' name='passConf' type='password'><br><br>"
 "<input class='boton' type='submit' value='GUARDAR'/><br><br>"
 "</form>"
 "<a href='escanear'><button class='boton'>ESCANEAR</button></a><br><br>";
@@ -89,7 +101,21 @@ void modoconf() {
   delay(100);
   digitalWrite(WIFICONFIGLED, LOW);
 
-  WiFi.softAP(ssidConf, passConf);
+  leer(100).toCharArray(confstat, 50);
+  Serial.print("confstat=");
+  Serial.println(confstat);
+  
+  if (strcmp(confstat,"SERVER CONF SAVED")==0) {
+    leer(0).toCharArray(ssidConf, 50);
+    leer(50).toCharArray(passConf, 50);
+    WiFi.softAP(ssidConf, passConf);
+    Serial.print("ssidConf=");
+    Serial.println(ssidConf);
+  }
+  else {
+    WiFi.softAP(ssidInit, passInit);
+  }
+
   IPAddress myIP = WiFi.softAPIP(); 
   Serial.print("IP del acces point: ");
   Serial.println(myIP);
@@ -110,11 +136,19 @@ void modoconf() {
 
 //---------------------GUARDAR CONFIGURACION-------------------------
 void guardar_conf() {
-  
-  Serial.println(server.arg("ssid"));//Recibimos los valores que envia por GET el formulario web
-  grabar(0,server.arg("ssid"));
-  Serial.println(server.arg("pass"));
-  grabar(50,server.arg("pass"));
+  if (server.arg("ssidConf")!="") {
+    Serial.println(server.arg("ssidConf"));//Recibimos los valores que envia por GET el formulario web
+    grabar(0,server.arg("ssidConf"));
+    Serial.println(server.arg("passConf"));
+    grabar(50,server.arg("passConf"));
+    grabar(100,"SERVER CONF SAVED");
+  }
+  if (server.arg("ssid")!="") {
+    Serial.println(server.arg("ssid"));//Recibimos los valores que envia por GET el formulario web
+    grabar(150,server.arg("ssid"));
+    Serial.println(server.arg("pass"));
+    grabar(200,server.arg("pass"));
+  }
 
   mensaje = "Configuracion Guardada...";
   paginaconf();
@@ -196,8 +230,8 @@ void setup() {
     modoconf();
   }
 
-  leer(0).toCharArray(ssid, 50);
-  leer(50).toCharArray(pass, 50);
+  leer(150).toCharArray(ssid, 50);
+  leer(200).toCharArray(pass, 50);
 
   setup_wifi();
 }
