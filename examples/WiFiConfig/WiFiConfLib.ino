@@ -1,15 +1,8 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <EEPROM.h>
-#define WIFICONFIGLED     LED_BUILTIN 
-#define WIFICONFIGBUTTON           D1
 
 //-------------------VARIABLES GLOBALES--------------------------
-int contconexion = 0;
-unsigned long previousMillis = 0;
-
-char ssid[50];      
-char pass[50];
 
 char ssidConf[50];      
 char passConf[50];
@@ -30,13 +23,13 @@ String pagina = "<!DOCTYPE html>"
 "<body>"
 "</form>"
 "<form action='guardar_conf' method='get'>"
-"<h1>Accés internet</h1>"
+"<h1>Xarxa usuari</h1>"
 "Deixar en blanc per mantenir els valors<br><br>"
 "SSID:  "
 "<input class='input1' name='ssid' type='text'><br>"
 "PASSWORD:  "
 "<input class='input1' name='pass' type='password'><br><br>"
-"<h1>Servidor configuració</h1>"
+"<h1>Xarxa configuració</h1>"
 "Deixar en blanc per mantenir els valors<br><br>"
 "SSIDConf:  "
 "<input class='input1' name='ssidConf' type='text'><br>"
@@ -49,31 +42,6 @@ String pagina = "<!DOCTYPE html>"
 String paginafin = "</body>"
 "</html>";
 
-//------------------------SETUP WIFI-----------------------------
-void setup_wifi() {
-// Conexión WIFI
-  WiFi.mode(WIFI_STA); //para que no inicie el SoftAP en el modo normal
-  WiFi.begin(ssid, pass);
-  while (WiFi.status() != WL_CONNECTED and contconexion <50) { //Cuenta hasta 50 si no se puede conectar lo cancela
-    ++contconexion;
-    delay(250);
-    Serial.print(".");
-    digitalWrite(13, HIGH);
-    delay(250);
-    digitalWrite(13, LOW);
-  }
-  if (contconexion <50) {   
-      Serial.println("");
-      Serial.println("WiFi conectado");
-      Serial.println(WiFi.localIP());
-      digitalWrite(13, HIGH);  
-  }
-  else { 
-      Serial.println("");
-      Serial.println("Error de conexion");
-      digitalWrite(13, LOW);
-  }
-}
 
 //--------------------------------------------------------------
 WiFiClient espClient;
@@ -106,8 +74,8 @@ void modoconf() {
   Serial.println(confstat);
   
   if (strcmp(confstat,"SERVER CONF SAVED")==0) {
-    leer(0).toCharArray(ssidConf, 50);
-    leer(50).toCharArray(passConf, 50);
+    leer(EEPROM_SSID_CONF).toCharArray(ssidConf, 50);
+    leer(EEPROM_PASS_CONF).toCharArray(passConf, 50);
     WiFi.softAP(ssidConf, passConf);
     Serial.print("ssidConf=");
     Serial.println(ssidConf);
@@ -138,16 +106,16 @@ void modoconf() {
 void guardar_conf() {
   if (server.arg("ssidConf")!="") {
     Serial.println(server.arg("ssidConf"));//Recibimos los valores que envia por GET el formulario web
-    grabar(0,server.arg("ssidConf"));
+    grabar(EEPROM_SSID_CONF,server.arg("ssidConf"));
     Serial.println(server.arg("passConf"));
-    grabar(50,server.arg("passConf"));
-    grabar(100,"SERVER CONF SAVED");
+    grabar(EEPROM_PASS_CONF,server.arg("passConf"));
+    grabar(EEPROM_STAT_CONF,"SERVER CONF SAVED");
   }
   if (server.arg("ssid")!="") {
     Serial.println(server.arg("ssid"));//Recibimos los valores que envia por GET el formulario web
-    grabar(150,server.arg("ssid"));
+    grabar(EEPROM_SSID,server.arg("ssid"));
     Serial.println(server.arg("pass"));
-    grabar(200,server.arg("pass"));
+    grabar(EEPROM_PASS,server.arg("pass"));
   }
 
   mensaje = "Configuracion Guardada...";
@@ -206,10 +174,8 @@ void escanear() {
   }
 }
 
-//------------------------SETUP-----------------------------
-void setup() {
-
-  pinMode(WIFICONFIGLED, OUTPUT);  
+void setup_conf(){
+    pinMode(WIFICONFIGLED, OUTPUT);  
   
   // Inicia Serial
   Serial.begin(115200);
@@ -229,23 +195,10 @@ void setup() {
   if (digitalRead(WIFICONFIGBUTTON) == 0) {
     modoconf();
   }
-
-  leer(150).toCharArray(ssid, 50);
-  leer(200).toCharArray(pass, 50);
-
-  setup_wifi();
 }
 
-//--------------------------LOOP--------------------------------
-void loop() {
 
-  unsigned long currentMillis = millis();
 
-  if (currentMillis - previousMillis >= 5000) { //envia la temperatura cada 5 segundos
-    previousMillis = currentMillis;
-    Serial.println("Funcionado...");
-  }
-}
 
 
 
