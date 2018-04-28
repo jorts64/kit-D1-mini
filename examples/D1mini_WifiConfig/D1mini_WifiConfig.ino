@@ -1,6 +1,8 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <EEPROM.h>
+#define WIFICONFIGLED     LED_BUILTIN 
+#define WIFICONFIGBUTTON           D1
 
 //-------------------VARIABLES GLOBALES--------------------------
 int contconexion = 0;
@@ -75,13 +77,17 @@ void paginaconf() {
 void modoconf() {
    
   delay(100);
-  digitalWrite(13, HIGH);
+  digitalWrite(WIFICONFIGLED, HIGH);
   delay(100);
-  digitalWrite(13, LOW);
+  digitalWrite(WIFICONFIGLED, LOW);
   delay(100);
-  digitalWrite(13, HIGH);
+  digitalWrite(WIFICONFIGLED, HIGH);
   delay(100);
-  digitalWrite(13, LOW);
+  digitalWrite(WIFICONFIGLED, LOW);
+  delay(100);
+  digitalWrite(WIFICONFIGLED, HIGH);
+  delay(100);
+  digitalWrite(WIFICONFIGLED, LOW);
 
   WiFi.softAP(ssidConf, passConf);
   IPAddress myIP = WiFi.softAPIP(); 
@@ -169,7 +175,7 @@ void escanear() {
 //------------------------SETUP-----------------------------
 void setup() {
 
-  pinMode(13, OUTPUT); // D7 
+  pinMode(WIFICONFIGLED, OUTPUT);  
   
   // Inicia Serial
   Serial.begin(115200);
@@ -177,8 +183,16 @@ void setup() {
 
   EEPROM.begin(512);
 
-  pinMode(14, INPUT);  //D5
-  if (digitalRead(14) == 0) {
+  digitalWrite(WIFICONFIGLED, HIGH);
+  delay(300);
+  digitalWrite(WIFICONFIGLED, LOW);
+  delay(300);
+  digitalWrite(WIFICONFIGLED, HIGH);
+  delay(300);
+  digitalWrite(WIFICONFIGLED, LOW);
+ 
+  pinMode(WIFICONFIGBUTTON, INPUT); 
+  if (digitalRead(WIFICONFIGBUTTON) == 0) {
     modoconf();
   }
 
