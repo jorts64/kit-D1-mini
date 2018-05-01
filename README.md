@@ -1,5 +1,5 @@
 # kit-D1-mini
-kit wemos D1 mini: documentació, [[wiki]], col·lecció d'exemples
+kit wemos D1 mini: documentació, [wiki](/wiki), col·lecció d'exemples
 
 ## Contingut
 * [tripler base](https://wiki.wemos.cc/products:d1_mini_shields:tripler_base) amb [D1 mini](https://wiki.wemos.cc/products:d1:d1_mini), connector I2C ([DHT shield](https://wiki.wemos.cc/products:d1_mini_shields:dht_shield)) i terminals
