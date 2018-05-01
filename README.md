@@ -14,3 +14,5 @@ kit wemos D1 mini: documentació, [wiki](https://github.com/jorts64/kit-D1-mini/
 * Segon D1 mini
 
 ![kit](/docs/kit1.jpg)
+
+Podeu trobar més exemples a [https://github.com/wemos/D1_mini_Examples](https://github.com/wemos/D1_mini_Examples)
