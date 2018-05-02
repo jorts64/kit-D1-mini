@@ -41,8 +41,9 @@ void setup() {
   setup_conf();
   leer(EEPROM_SSID).toCharArray(ssid, 50);
   leer(EEPROM_PASS).toCharArray(pass, 50);
-//  setup_wifi();
-
+  setup_wifi();
+  
+  WiFi.mode(WIFI_OFF); //apaga WiFi
 
 }
 
