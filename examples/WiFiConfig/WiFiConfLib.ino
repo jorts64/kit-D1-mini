@@ -190,6 +190,8 @@ void setup_conf(){
   digitalWrite(WIFICONFIGLED, HIGH);
   delay(300);
   digitalWrite(WIFICONFIGLED, LOW);
+  delay(300);
+  digitalWrite(WIFICONFIGLED, HIGH);
  
   pinMode(WIFICONFIGBUTTON, INPUT); 
   if (digitalRead(WIFICONFIGBUTTON) == 0) {
