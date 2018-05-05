@@ -1,13 +1,12 @@
 /* 
  *  Concebut i recuinat per Jordi Orts (http://jorts.net)
- *  A la carpeta data s'utilitza la llibreria gauge.js amb llicencia MIT
+ *  A la carpeta data s'utilitza la llibreria gauge.js amb llicencia MIT, http://bernii.github.io/gauge.js/
  *  Si us plau, respecteu aquestes llicencies
  */
  
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>
 #include <FS.h>
 #include <WEMOS_DHT12.h>
 
@@ -19,13 +18,13 @@ const char *password = "Aquí la contrasenya de la xarxa";
 
 ESP8266WebServer server ( 80 );
 
-const int led = 13;
+const int led = BUILTIN_LED;
 
 int t;
 
 
 void handleRoot() {
-  digitalWrite ( led, 1 );
+  digitalWrite ( led, LOW );
   char temp[400];
   int sec = millis() / 1000;
   int min = sec / 60;
@@ -51,11 +50,11 @@ void handleRoot() {
     hr, min % 60, sec % 60
   );
   server.send ( 200, "text/html", temp );
-  digitalWrite ( led, 0 );
+  digitalWrite ( led, HIGH );
 }
 
 void handleNotFound() {
-  digitalWrite ( led, 1 );
+  digitalWrite ( led, LOW );
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -70,11 +69,12 @@ void handleNotFound() {
   }
 
   server.send ( 404, "text/plain", message );
-  digitalWrite ( led, 0 );
+  digitalWrite ( led, HIGH );
 }
 
 
 void handleAjax(){
+  digitalWrite ( led, LOW );
   dht12.get();
   t=dht12.cTemp;
   Serial.print("Temperature: ");
@@ -84,13 +84,14 @@ void handleAjax(){
   snprintf(temp, 100, "%d", t);
   out += temp;
   server.send ( 200, "text/txt", out);
+  digitalWrite ( led, HIGH );
 }
 
 
 
 void setup ( void ) {
   pinMode ( led, OUTPUT );
-  digitalWrite ( led, 0 );
+  digitalWrite ( led, HIGH );
   Serial.begin ( 115200 );
   WiFi.begin ( ssid, password );
   SPIFFS.begin();
@@ -107,10 +108,6 @@ void setup ( void ) {
   Serial.println ( ssid );
   Serial.print ( "IP address: " );
   Serial.println ( WiFi.localIP() );
-
-  if ( MDNS.begin ( "esp8266" ) ) {
-    Serial.println ( "MDNS responder started" );
-  }
 
   server.on ( "/", handleRoot );
   server.serveStatic("/gauge", SPIFFS, "/gauge"); //  gauge files dir

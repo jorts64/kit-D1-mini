@@ -13,10 +13,8 @@
 
 DHT12 dht12;
 
-//const char *ssid = "Aquí el nom de la teva xarxa";
-//const char *password = "Aquí la contrasenya de la xarxa";
-const char *ssid = "jortstv";
-const char *password = "9periodico";
+const char *ssid = "Aquí el nom de la teva xarxa";
+const char *password = "Aquí la contrasenya de la xarxa";
 
 ESP8266WebServer server ( 80 );
 
@@ -56,7 +54,7 @@ void handleRoot() {
 }
 
 void handleNotFound() {
-  digitalWrite ( led, 1 );
+  digitalWrite ( led, LOW );
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -71,7 +69,7 @@ void handleNotFound() {
   }
 
   server.send ( 404, "text/plain", message );
-  digitalWrite ( led, 0 );
+  digitalWrite ( led, HIGH );
 }
 
 
