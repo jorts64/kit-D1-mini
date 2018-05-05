@@ -36,7 +36,7 @@ void paginacanvi() {
 }
 
 void canviar_colors() {
-  pixels.setPixelColor(0, pixels.Color(server.arg("r").toInt(), server.arg("g").toInt(), server.arg("b").toInt()));
+  pixels.setPixelColor(0, server.arg("r").toInt(), server.arg("g").toInt(), server.arg("b").toInt());
   pixels.show(); // This sends the updated pixel color to the hardware.
   paginacanvi();
 }
