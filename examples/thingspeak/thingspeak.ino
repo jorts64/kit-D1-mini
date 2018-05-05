@@ -12,8 +12,6 @@ const char * myWriteAPIKey = "API key aqui";
 
 const int led = BUILTIN_LED;  // internal blue led
 
-int t;
-
 void setup () {
   pinMode ( led, OUTPUT );
   digitalWrite ( led, HIGH );
@@ -32,8 +30,7 @@ void loop () {
 
   digitalWrite ( led, LOW );
   dht12.get();
-  t = dht12.cTemp;
-  ThingSpeak.writeField(myChannelNumber, 1, t, myWriteAPIKey);
+  ThingSpeak.writeField(myChannelNumber, 1, dht12.cTemp, myWriteAPIKey);
   digitalWrite ( led, HIGH );
 
   delay(60000); // ThingSpeak will only accept updates every 15 seconds.

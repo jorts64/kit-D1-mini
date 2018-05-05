@@ -25,15 +25,15 @@ void loop() {
 
 
   // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 2; j++) {
-      for (int k = 0; k < 2; k++) {
+  for (int i = 0; i < 6; i++) {
+    for (int j = 0; j < 6; j++) {
+      for (int k = 0; k < 6; k++) {
 
-        pixels.setPixelColor(0, pixels.Color(i * 255, j * 255, k * 255)); // Moderately bright green color.
+        pixels.setPixelColor(0, pixels.Color(i * 51, j * 51, k * 51)); // Moderately bright green color.
 
         pixels.show(); // This sends the updated pixel color to the hardware.
 
-        delay(200); // Delay for a period of time (in milliseconds).
+        delay(400); // Delay for a period of time (in milliseconds).
       }
     }
   }
