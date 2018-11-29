@@ -3,7 +3,7 @@
 #include <ESP8266WebServer.h>
 #include <FS.h>
 
-const char *ssid = "IPV-IoT-4";
+const char *ssid = "IPV-IOT-4";
 const char *password = "INSPVIANA";
 
 int Lectura,valor;
@@ -53,6 +53,7 @@ void handleAjax(){
 void setup() {
   Serial.begin(115200);
   SPIFFS.begin();
+  WiFi.mode(WIFI_AP);
   WiFi.softAP ( ssid, password );
   server.on ( "/", handleRoot );
   server.serveStatic("/gauge", SPIFFS, "/gauge"); //  gauge files dir

@@ -1,0 +1,52 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width"> 
+	<title>Gauge Test</title>
+	<script src="gauge.js"></script>
+	<style>body{padding:0;margin:0;background:#000}</style>
+	
+	<script>
+	function DrawGauge() 
+	{
+		gauge = new Gauge({
+			renderTo   : 'gauge',
+			width       : document.body.clientWidth,
+			height      : document.body.clientHeight,
+			maxValue   : 1000,
+			majorTicks : ['0','100','200','300','400','500','600','700','800','900','1000'],
+			glow       : true,
+			units      : 'ms',
+			title      : 'Delay',
+			highlights : false,
+			glow : false,
+			valueFormat : { int : 4, dec : 1 },
+			colors : {
+				needle : { start : 'lightgreen', end : 'navy' },
+				plate : 'lightyellow',
+				title : 'green',
+				units : 'lightgreen',
+				majorTicks : 'darkgreen',
+				minorTicks : 'lightgreen',
+				numbers : 'darkgreen'
+			},
+			animation : {
+				delay : 25,
+				duration: 500,
+				fn : 'elastic'
+			}
+		});
+
+		gauge.draw();
+	};	
+	</script>
+	
+</head>
+<body>
+	<canvas id="gauge"></canvas>
+	<div id="console"></div>
+	<script>
+		DrawGauge();
+	</script>
+
+</html>
