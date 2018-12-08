@@ -60,7 +60,7 @@ void loop(void) {
 void pageHead(){
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   server.send(200, "text/html", "");
-  server.sendContent("<!DOCTYPE html><html><head><title>Tutorial slider</title><meta charset='UTF-8'><meta name='viewport' content='width=device-width'/></head><body>");  
+  server.sendContent("<!DOCTYPE html><html><head><title>Gesti&oacute; de fitxersr</title><meta charset='UTF-8'><meta name='viewport' content='width=device-width'/></head><body>");  
 }
 
 void initWifi(){
@@ -143,14 +143,15 @@ void printDirectory(){
     output += formatBytes(fileSize).c_str();
     output += "     <a href='";
     output += fileName;
-    output +="?download=1'> D </a>";
+    output +="?download=1' style='text-decoration: none;'> &#9921; </a>&nbsp;&nbsp;";
     output += "     <a href='/edit?fe=";
     output += fileName;
-    output +="'> E </a>";
+    output +="' style='text-decoration: none;'> &#9997; </a>&nbsp;&nbsp;";
     output += "     <a href='/delete?killfitxer=";
     output += fileName;
-    output +="'> X </a><br/>";
+    output +="' style='text-decoration: none;'> &#10006; </a><br/>";
     server.sendContent(output);
+    DBG_OUTPUT_PORT.println(output);
 
   }
   
