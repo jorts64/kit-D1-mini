@@ -14,8 +14,8 @@ OTA / FSmanager / foto / canvi maxtemp
 
 #define DBG_OUTPUT_PORT Serial
 
-const char* ssid = "jortsnet";
-const char* password = "9periodico";
+const char* ssid = "la teva xarxa";
+const char* password = "la teva contrasenya";
 const char* host = "esp8266fs";
 // tria el tipus de connexió. Client WIFI_STA, Access Point WIFI_AP
 #define MODE_WIFI WIFI_STA
