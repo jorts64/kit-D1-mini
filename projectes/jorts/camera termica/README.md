@@ -3,8 +3,8 @@
 Càmera tèrmica econòmica basada en el sensor IR 8x8 AMG8833 i el D1 mini
 Utilitza interpolació cúbica per obtenir una imatge més inteligible.
 
-!(https://github.com/jorts64/kit-D1-mini/blob/master/projectes/jorts/camera%20termica/fotos/20181216_005914.jpg)
-!(https://github.com/jorts64/kit-D1-mini/blob/master/projectes/jorts/camera%20termica/fotos/20181216_010029.jpg)
+![foto1](https://github.com/jorts64/kit-D1-mini/blob/master/projectes/jorts/camera%20termica/fotos/20181216_005914.jpg)
+![foto2](https://github.com/jorts64/kit-D1-mini/blob/master/projectes/jorts/camera%20termica/fotos/20181216_010029.jpg)
 
 ## Llista de materials
 * [D1 mini](https://github.com/jorts64/kit-D1-mini/wiki/D1-mini)
