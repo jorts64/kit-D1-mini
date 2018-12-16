@@ -23,7 +23,7 @@ void displayImage(uint64_t image) {
   for (int i = 0; i < 8; i++) {
     byte row = (image >> i * 8) & 0xFF;
     for (int j = 0; j < 8; j++) {
-      mled.dot(j, i, bitRead(row, j));
+      mled.dot(j, 7-i, bitRead(row, j));
     }
   }
   mled.display();
