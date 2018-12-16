@@ -1,5 +1,5 @@
 # kit-D1-mini
-kit wemos D1 mini: documentació, [wiki](https://github.com/jorts64/kit-D1-mini/wiki), col·lecció d'exemples (especialment interessants els que utilitzen una [interfície web HTML5](https://github.com/jorts64/kit-D1-mini/wiki/interf%C3%ADcie-web-HTML5)) i de [projectes](https://github.com/jorts64/kit-D1-mini/wiki/projectes) realitzats a 4t d'ESO i Batxillerat 
+kit wemos D1 mini: documentació, [wiki](https://github.com/jorts64/kit-D1-mini/wiki), [col·lecció d'exemples](https://github.com/jorts64/kit-D1-mini/releases/download/v1.0/examples.zip) (especialment interessants els que utilitzen una [interfície web HTML5](https://github.com/jorts64/kit-D1-mini/wiki/interf%C3%ADcie-web-HTML5)) i de [projectes](https://github.com/jorts64/kit-D1-mini/wiki/projectes) realitzats a 4t d'ESO i Batxillerat 
 
 Per utilitzar aquest kit necessitarem una [instal·lació de l'Arduino IDE amb l'extensió per treballar amb els xips ESP8266](https://github.com/jorts64/kit-D1-mini/wiki/instal%C2%B7laci%C3%B3-de-l%27Arduino-IDE-amb-l%27extensi%C3%B3-per-treballar-amb-els-xips-ESP8266)
 
