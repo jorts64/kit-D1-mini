@@ -1,11 +1,5 @@
-/*
- * Relay Shield - Blink
- * Turns on the relay for two seconds, then off for two seconds, repeatedly.
- *
- * Relay Shield transistor closes relay when D1 is HIGH
- */
-
-const int relayPin = D1;
+const int relayPin = D1;  // comment for kit D1 mini R1
+//const int relayPin = D7;  // uncomment for kit D1 mini R1
 const long interval = 2000;  // pause for two seconds
 
 void setup() {
