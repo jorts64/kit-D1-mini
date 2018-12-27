@@ -347,6 +347,9 @@ void muestraFoto(String fn, int npos, int ntot){
   txt=getLine();
 //  oled.println(txt);
   txt=getLine(); // map
+  for (r=0;txt.charAt(r)!='-';r++);
+  mintemp=txt.substring(0,r-1).toFloat();
+  maxtemp=txt.substring(r+1).toFloat();
   oled.println(txt);
   txt=getLine();
   oled.println(txt);
