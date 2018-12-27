@@ -1,7 +1,7 @@
 /***************************************************************************
 Camèra tèrmica amb AMG8833, D1 mini, TFT1.4, RTC, OLED i keypad
 interpolació
-OTA / FSmanager / foto / canvi maxtemp
+OTA / FSmanager / foto / canvi maxtemp i mintemp / cataleg
 ***************************************************************************/
 
 #include <ESP8266WiFi.h>
@@ -11,14 +11,15 @@ OTA / FSmanager / foto / canvi maxtemp
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <FS.h>
+File f;
 
 #define DBG_OUTPUT_PORT Serial
 
-const char* ssid = "la teva xarxa";
-const char* password = "la teva contrasenya";
+const char* ssid = "jortsnet";
+const char* password = "9periodico";
 const char* host = "esp8266fs";
 // tria el tipus de connexió. Client WIFI_STA, Access Point WIFI_AP
-#define MODE_WIFI WIFI_STA
+int MODE_WIFI=WIFI_STA;
 
 ESP8266WebServer server(80);
 File fsUploadFile;
@@ -46,6 +47,7 @@ MicroOLED oled(PIN_RESET, DC_JUMPER);    // I2C declaration
 
 #include "RTClib.h"
 RTC_DS1307 RTC;
+DateTime now;
 
 //Comment this out to remove the text overlay
 //#define SHOW_TEMP_TEXT
@@ -58,7 +60,7 @@ RTC_DS1307 RTC;
 
 float mintemp = MINTEMP;
 float maxtemp = MAXTEMP;
-
+float minT,maxT;
 
 //the colors we will be using
 const uint16_t camColors[] = {0x480F,
@@ -101,7 +103,9 @@ float pixels[AMG_COLS * AMG_ROWS];
 #define INTERPOLATED_COLS 24
 #define INTERPOLATED_ROWS 24
 
+float dest_2d[INTERPOLATED_ROWS * INTERPOLATED_COLS];
 
+// Interpolation functions
 float get_point(float *p, uint8_t rows, uint8_t cols, int8_t x, int8_t y);
 void set_point(float *p, uint8_t rows, uint8_t cols, int8_t x, int8_t y, float f);
 void get_adjacents_1d(float *src, float *dest, uint8_t rows, uint8_t cols, int8_t x, int8_t y);
@@ -110,9 +114,7 @@ float cubicInterpolate(float p[], float x);
 float bicubicInterpolate(float p[], float x, float y);
 void interpolate_image(float *src, uint8_t src_rows, uint8_t src_cols, 
                        float *dest, uint8_t dest_rows, uint8_t dest_cols);
-int readbutton();
-void OTAwait();
-// Helper functions prototypes
+// WiFi Helper functions prototypes
 void OkRetorn();
 void printDirectory();
 void handleFileCreate();
@@ -126,41 +128,35 @@ void handleFileSave();
 void initHelper();
 void initWifi();
 void pageHead();
-
+// Other functions
+String getLine();
+String getValue(String data, char separator, int index);
+int readbutton();
+int tecla;
+void OTAwait();
+void muestraFoto(String fn, int npos, int ntot);
         
 void setup() {
+  pinMode(D0, INPUT);
   delay(500);
   Serial.begin(115200);  
-  Serial.println("\n\nAMG88xx Interpolated Thermal Camera!");
-
   SPIFFS.begin();
-
   tft.initR(INITR_144GREENTAB);   // initialize a ST7735S chip, black tab
   tft.setRotation(3);
   tft.fillScreen(ST7735_BLACK);
-    
-  // default settings
-  if (!amg.begin()) {
-    Serial.println("Could not find a valid AMG88xx sensor, check wiring!");
-    while (1) { delay(1); }
-  }
-
-  oled.begin();    // Initialize the OLED
-  oled.clear(ALL); // Clear the display's internal memory
-  oled.display();  // Display what's in the buffer (splashscreen)
-  delay(1000);     // Delay 1000 ms
-  oled.clear(PAGE); // Clear the buffer.
-
+  amg.begin();
+  oled.begin();    
+  oled.clear(ALL); 
+  oled.display();  
+  delay(1000);     
+  oled.clear(PAGE); 
   RTC.begin();
-  RTC.adjust(DateTime(__DATE__, __TIME__));
-    
-  Serial.println("-- Thermal Camera Test --");
+//  RTC.adjust(DateTime(__DATE__, __TIME__));  //uncomment 1st upload to adjust time
 }
 
 void loop() {
-  int tecla;
   tecla = readbutton();
-  float minT,maxT;
+  unsigned long ara;
 
   amg.readPixels(pixels);
 
@@ -171,14 +167,235 @@ void loop() {
     maxT=max(maxT,pixels[i]);
   }
 
+  now = RTC.now(); 
+  oledData();
+
+  pintaFoto();
+
+  if (digitalRead(D0) == LOW) {             // button on D0 for developing proposes
+    oledOTA();
+    OTAwait();
+  }
+  if (tecla == 5) {                         // LEFT
+    ara=millis();
+    while ((readbutton()==5)&&((millis()-ara)<=10000)) delay(1);
+    if ((millis()-ara)>=10000)
+      FMWifiAP(); 
+    else {
+      mintemp--;
+    }
+  }
+  if (tecla == 2) {                         // RIGHT
+    ara=millis();
+    while ((readbutton()==2)&&((millis()-ara)<=10000)) delay(1);
+    if ((millis()-ara)>=10000)
+      FMWifi();
+    else {
+      mintemp++;
+      if (maxtemp-mintemp < 5)
+        maxtemp = mintemp + 5;
+    }
+  }
+  if (tecla == 4) {                         // UP
+    ara=millis();
+    while ((readbutton()==4)&&((millis()-ara)<=5000)) delay(1);
+    if ((millis()-ara)>=5000)
+      cataleg();
+    else {
+    maxtemp++;
+    }
+  }
+  if (tecla == 3) {                         // DOWN
+    ara=millis();
+    while ((readbutton()==3)&&((millis()-ara)<=10000)) delay(1);
+    if ((millis()-ara)>=10000){
+      oledOTA();
+      OTAwait();
+      }
+    else {
+      maxtemp--;
+      if (maxtemp-mintemp < 5)
+        mintemp = maxtemp - 5;
+    }
+  }
+  if (tecla == 1) {                         // SHOT
+    takeFoto();
+    delay (2000);
+  }
+  delay(1);
+}
+
+
+void cataleg(){
+  String fileName[100];
+  String nom;
+  int n=0;
+  int pos,i; 
   oled.clear(PAGE);
   oled.setFontType(0);
   oled.setCursor(0,0);
-//  oled.print(analogRead(A0));
-//  oled.print(" B=");
-//  oled.println(tecla, DEC);
+  oled.println("Cercant");
+  oled.println("fotos");
+  oled.display(); 
+  delay(1000);
+  Dir dir = SPIFFS.openDir("/");
+  while (dir.next()) {
+    nom = dir.fileName();
+    oled.clear(PAGE);
+    oled.setFontType(0);
+    oled.setCursor(0,0);
+    oled.println(nom);
+    if ((nom.startsWith("/foto"))&&(n<100)){
+      fileName[n] = nom;
+      n++;
+    }
+    oled.display(); 
+    delay(10);
+  }
+  oled.clear(PAGE);
+  oled.setFontType(0);
+  oled.setCursor(0,0);
+  oled.println("Trobades");
+  oled.print(n, DEC);
+  oled.println(" fotos");
+  oled.display(); 
+  delay(1000);
+  pos=n-1;
+  muestraFoto(fileName[pos],pos,n);
+  tecla = readbutton();
+  while (tecla!=4) {
+    if (tecla==2) {
+      pos++;
+      if (pos==n) pos=0; 
+      muestraFoto(fileName[pos],pos,n);
+      delay(300);
+    }
+    if (tecla==5) {
+      if(pos==0)
+        pos=n-1;
+      else 
+        pos--; 
+      muestraFoto(fileName[pos],pos,n);
+      delay(300);
+    }
+    if (tecla==3) {
+      oled.clear(PAGE);
+      oled.setFontType(0);
+      oled.setCursor(0,0);
+      oled.println("Borrar");
+      oled.print(fileName[pos]);
+      oled.println(" ?");
+      oled.println("left NO");
+      oled.println("right SI");
+      oled.display(); 
+      delay(1000);
+      while ((tecla!=2)&&(tecla!=5)){
+        tecla = readbutton();
+        delay(1);        
+      }
+      if (tecla==2) {
+        SPIFFS.remove(fileName[pos]);
+        n--;
+        for (i=pos;i<n;i++) {
+          fileName[i]=fileName[i+1];
+        }
+        if (pos==n) pos=0;
+        oled.clear(PAGE);
+        oled.setFontType(0);
+        oled.setCursor(0,0);
+        oled.println("Foto");
+        oled.println("Borrada");
+        oled.display(); 
+        delay(1000);
+        muestraFoto(fileName[pos],pos,n);
+      }
+      else {
+        oled.clear(PAGE);
+        oled.setFontType(0);
+        oled.setCursor(0,0);
+        oled.println("Borrado");
+        oled.println("Cancelado");
+        oled.display(); 
+        delay(1000);
+        muestraFoto(fileName[pos],pos,n);
+      }
+      tecla=0;
+    }
+    tecla = readbutton();
+    delay(10);
+  }
+  tecla=0;
+}
 
-  DateTime now = RTC.now(); 
+void muestraFoto(String fn, int npos, int ntot){
+  String txt;
+  float sa[8]; 
+  int r,t;
+  delay(1);
+  f = SPIFFS.open(fn,"r");
+  oled.clear(PAGE);
+  oled.setFontType(0);
+  oled.setCursor(0,0);
+  oled.print("< > ");
+  oled.print(npos+1, DEC);
+  oled.print("/");
+  oled.println(ntot);
+  txt=getLine();
+  oled.println(txt);
+  txt=getLine();
+  oled.println(txt);
+  txt=getLine();
+//  oled.println(txt);
+  txt=getLine(); // map
+  oled.println(txt);
+  txt=getLine();
+  oled.println(txt);
+  txt=getLine();
+  oled.println(txt);
+  oled.display(); 
+  for (int i=0;i<8;i++){
+    txt=getLine();
+    r=0; t=0;
+    for (int k=0; k <txt.length(); k++) { 
+      if(txt.charAt(k) == ',')  { 
+        sa[t] = txt.substring(r, k).toFloat(); 
+        r=(k+1); 
+        t++; 
+      }
+    }
+    for (int j=0;j<8;j++) {
+        pixels[i*8+j]=sa[j];
+    }
+  }
+  f.close();    
+  delay(1);
+  pintaFoto();
+}
+
+String getLine() {
+  String S = "" ;
+  char c = f.read(); 
+  while ( c != '\n')      
+       {     
+             S = S + c ;
+             c = f.read();
+       }
+  return(S) ;
+}
+
+void pintaFoto(){
+  interpolate_image(pixels, AMG_ROWS, AMG_COLS, dest_2d, INTERPOLATED_ROWS, INTERPOLATED_COLS);
+  delay(1);
+  uint16_t boxsize = min(tft.width() / INTERPOLATED_COLS, tft.height() / INTERPOLATED_COLS);
+  drawpixels(dest_2d, INTERPOLATED_ROWS, INTERPOLATED_COLS, boxsize, boxsize);  
+  delay(1);
+}
+
+void oledData(){
+  delay(1);
+  oled.clear(PAGE);
+  oled.setFontType(0);
+  oled.setCursor(0,0);
   oled.print(now.day(), DEC);
   oled.print("/");
   oled.print(now.month(), DEC);
@@ -189,67 +406,20 @@ void loop() {
   oled.print(now.minute(), DEC);
   oled.print(":");
   oled.println(now.second(), DEC);
-
+  delay(1);
   oled.print(mintemp, 1);
   oled.print("-");
   oled.println(maxtemp, 1);
-
   oled.print("Tmin:");
   oled.println(minT, 1);
   oled.print("Tmax:");
   oled.println(maxT, 1);
-
+  delay(1);
   oled.display();
-
-  float dest_2d[INTERPOLATED_ROWS * INTERPOLATED_COLS];
-
-  int32_t t = millis();
-  interpolate_image(pixels, AMG_ROWS, AMG_COLS, dest_2d, INTERPOLATED_ROWS, INTERPOLATED_COLS);
-//  Serial.print("Interpolation took "); Serial.print(millis()-t); Serial.println(" ms");
-
-  uint16_t boxsize = min(tft.width() / INTERPOLATED_COLS, tft.height() / INTERPOLATED_COLS);
-  
-  drawpixels(dest_2d, INTERPOLATED_ROWS, INTERPOLATED_COLS, boxsize, boxsize);
-
-if (tecla == 5) {
-  oled.clear(PAGE);
-  oled.setFontType(0);
-  oled.setCursor(0,0);
-  oled.println("Esperant");
-  oled.println("firmware");
-  oled.println("OTA");
-  oled.display();
-
-  OTAwait();
+  delay(1); 
 }
-if (tecla == 2) {
-  oled.clear(PAGE);
-  oled.setFontType(0);
-  oled.setCursor(0,0);
 
-  oled.println("Gestor");
-  oled.println("de");
-  oled.println("fitxers");
-  oled.println("WiFi");
-  oled.display();
-
-  initHelper(); //inclou connexió Wifi
-  server.begin();
-  DBG_OUTPUT_PORT.println("HTTP server started");
-  while(true) {
-    server.handleClient();
-    delay(1);
-  }
-}
-if (tecla == 4) {
-  maxtemp++;
-  delay(300);
-}
-if (tecla == 3) {
-  maxtemp--;
-  delay(300);
-}
-if (tecla == 1) {
+void takeFoto(){
   String fname = "/foto";
   char temp[100];
   snprintf(temp, 100, "%d",now.year()%2000); 
@@ -265,8 +435,7 @@ if (tecla == 1) {
   snprintf(temp, 100, "%d",now.second()); 
   fname += temp;
   fname += ".dat";
-
-  File f = SPIFFS.open(fname,"w");
+  f = SPIFFS.open(fname,"w");
   f.print(now.day(), DEC);
   f.print("/");
   f.print(now.month(), DEC);
@@ -277,15 +446,11 @@ if (tecla == 1) {
   f.print(now.minute(), DEC);
   f.print(":");
   f.println(now.second(), DEC);
-
   f.print("T(Th) = ");
   f.println(amg.readThermistor());
- 
-  f.print("map ");
   f.print(mintemp, 1);
   f.print("-");
   f.println(maxtemp, 1);
-
   f.print("Tmin:");
   f.println(minT, 1);
   f.print("Tmax:");
@@ -297,19 +462,70 @@ if (tecla == 1) {
   }
   f.println();
   f.close();
-
   oled.clear(PAGE);
   oled.setFontType(0);
   oled.setCursor(0,0);
   oled.println("Imatge");
   oled.println("desada");
   oled.print(fname);
-  oled.display();
-  delay (2000);
+  oled.display();  
 }
 
+void FMWifi(){
+  oled.clear(PAGE);
+  oled.setFontType(0);
+  oled.setCursor(0,0);
+  oled.println("Gestor de");
+  oled.println("fitxers");
+  oled.println("WiFi");
+  oled.print("Connectant");
+  oled.println("a xarxa");
+  oled.display();
+  initHelper(); //inclou connexió Wifi
+  server.begin();
+  DBG_OUTPUT_PORT.println("HTTP server started");
+  oled.clear(PAGE);
+  oled.setFontType(0);
+  oled.setCursor(0,0);
+  oled.println("Gestor de");
+  oled.println("fitxers");
+  oled.println("WiFi a ");
+  oled.print("http://");
+  oled.print(WiFi.localIP());
+  oled.println("/dir");
+  oled.display();
+  while(true) {
+    server.handleClient();
+    delay(1);
+  }    
+}
 
-  delay(1);
+void FMWifiAP(){
+  MODE_WIFI=WIFI_AP;
+  oled.clear(PAGE);
+  oled.setFontType(0);
+  oled.setCursor(0,0);
+  oled.println("Gestor de");
+  oled.println("fitxers");
+  oled.println("WiFi");
+  oled.print("Creant");
+  oled.println("xarxa");
+  oled.display();
+  initHelper(); //inclou connexió Wifi
+  server.begin();
+  DBG_OUTPUT_PORT.println("HTTP server started");
+  oled.clear(PAGE);
+  oled.setFontType(0);
+  oled.setCursor(0,0);
+  oled.println("Gestor de");
+  oled.println("fitxers");
+  oled.println("WiFi a ");
+  oled.println("http://192.168.4.1/dir");
+  oled.display();
+  while(true) {
+    server.handleClient();
+    delay(1);
+  }    
 }
 
 void drawpixels(float *p, uint8_t rows, uint8_t cols, uint8_t boxWidth, uint8_t boxHeight) {
@@ -320,14 +536,12 @@ void drawpixels(float *p, uint8_t rows, uint8_t cols, uint8_t boxWidth, uint8_t 
       if(val >= maxtemp) colorTemp = maxtemp;
       else if(val <= mintemp) colorTemp = mintemp;
       else colorTemp = val;
-      
       uint8_t colorIndex = map(colorTemp, mintemp, maxtemp, 0, 255);
       colorIndex = constrain(colorIndex, 0, 255);
       //draw the pixels!
       uint16_t color;
       color = val * 2;
       tft.fillRect(boxWidth * x, boxHeight * y, boxWidth, boxHeight, camColors[colorIndex]);
-        
     } 
   }
 }
@@ -340,6 +554,16 @@ int readbutton() {
   if (button > 250) return (3);
   if (button > 100) return (4);
   return (5);      
+}
+
+void oledOTA(){
+  oled.clear(PAGE);
+  oled.setFontType(0);
+  oled.setCursor(0,0);
+  oled.println("Esperant");
+  oled.println("firmware");
+  oled.println("OTA");
+  oled.display();  
 }
 
 void OTAwait(){
@@ -429,7 +653,7 @@ void initWifi(){
   }
   else {
     WiFi.mode(WIFI_AP);
-    WiFi.softAP(ssid, password);
+    WiFi.softAP("IRCamera", "robotica");
     DBG_OUTPUT_PORT.print("Open http://192.168.4.1/dir to see the file browser");
   }
 }
