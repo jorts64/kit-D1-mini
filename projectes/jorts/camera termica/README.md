@@ -4,7 +4,19 @@ Càmera tèrmica econòmica basada en el sensor IR 8x8 AMG8833 i el D1 mini
 
 Utilitza interpolació cúbica per obtenir una imatge més inteligible.
 
-Amb OTA (L), gestor de fitxers WiFi (R), increment (U) i decrement (D) de la temperatura màxima mapejada, i registre de la imatge (CR) a la botonera superior. 
+# Botonera superior
+
+## Polsació breu
+
+increment (U) i decrement (D) de la temperatura màxima mapejada, increment (R) i decrement (L) de la temperatura màxima mapejada, i registre de la imatge (CR).
+
+## Polsació llarga
+
+Catàleg de fotos (U), OTA (D), gestor de fitxers WiFi STA (R), gestor de fitxers WiFi AP (L) 
+
+## Catàleg de fotos
+
+Anterior (L), posterior (R), Esborrar (D) i sortir (U)
 
 ![foto1](https://github.com/jorts64/kit-D1-mini/blob/master/projectes/jorts/camera%20termica/fotos/20181216_005914.jpg)
 ![foto2](https://github.com/jorts64/kit-D1-mini/blob/master/projectes/jorts/camera%20termica/fotos/20181216_010029.jpg)
