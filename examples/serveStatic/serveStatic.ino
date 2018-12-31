@@ -3,8 +3,8 @@
 #include <ESP8266WebServer.h>
 #include <FS.h>
 
-const char *ssid = "jortsnet";
-const char *password = "9periodico";
+const char *ssid = "Nom de la xarxa";
+const char *password = "contrasenya";
 
 ESP8266WebServer server ( 80 );
 
