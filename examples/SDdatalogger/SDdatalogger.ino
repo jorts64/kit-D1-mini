@@ -12,8 +12,8 @@ DHT12 dht12;
 ESP8266WebServer server ( 80 );
 unsigned long ara;
 
-const char *ssid = "jortsnet";
-const char *password = "9periodico";
+const char *ssid = "Nom de la xarxa";
+const char *password = "contrasenya";
 
 void espera (int n) {
   while (millis()<ara+n) {
