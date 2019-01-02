@@ -66,13 +66,13 @@ void canviar_colors() {
 void setup() {
   Serial.begin(115200);
   WiFi.begin ( ssid, password );
-  pixels.begin(); // This initializes the NeoPixel library.
-  server.on("/", paginacanvi); //esta es la pagina de configuracion
-  server.on("/canviar", canviar_colors); //Graba en la eeprom la configuracion
+  pixels.begin(); 
+  server.on("/", paginacanvi); 
+  server.on("/canviar", canviar_colors); 
   server.begin();
 
   pixels.setPixelColor(0, pixels.Color(0, 63, 0));
-  pixels.show(); // This sends the updated pixel color to the hardware.
+  pixels.show(); 
 
 }
 
