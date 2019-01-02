@@ -7,8 +7,8 @@
 
 #define DBG_OUTPUT_PORT Serial
 
-const char* ssid = "jortsnet";
-const char* password = "9periodico";
+const char* ssid = "nom de la xarxa";
+const char* password = "contrasenya";
 const char* host = "esp8266fs";
 // tria el tipus de connexió. Client WIFI_STA, Access Point WIFI_AP
 #define MODE_WIFI WIFI_STA
