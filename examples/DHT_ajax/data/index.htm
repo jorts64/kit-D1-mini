@@ -1,0 +1,52 @@
+<html>
+<head>
+  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+  <meta name='viewport' content='width=device-width'> 
+  <title>AJAX Test</title>
+  <style>
+    body {
+      background-color: Cornsilk;
+    }
+  </style>
+  <script>
+    function loadTemp() {
+      var xhttp = new XMLHttpRequest();
+      var temp = 0;
+      xhttp.open('GET', 'ajax_info.txt', false);
+      xhttp.send();
+      temp = parseFloat(xhttp.responseText);
+      return (temp);
+    } 
+  </script>
+  <style> 
+    #valor {
+                 border-radius: 25px;
+                 background: #73AD21;
+                 padding: 20px; 
+                 width: 55px;
+                 height: 12px;  
+                 text-align: center;
+    }
+  </style>
+</head>
+<body>
+<h1>Temperatura</h1>
+<div style="padding-left:40px;padding-bottom:5px;">
+<p id='valor'></p>
+</div>
+<p><img id='icona' src='cloud.svg'></p>
+<script>
+var myVar = setInterval(myTimer, 1000);
+function myTimer() {
+  var t= loadTemp();
+  document.getElementById('valor').innerHTML = t+' °C';
+  if (t>27) {
+    document.getElementById('icona').src = 'sun.svg';
+  } 
+  else {
+    document.getElementById('icona').src = 'snowflake.svg';
+  } 
+}
+</script>
+</body>
+</html>
