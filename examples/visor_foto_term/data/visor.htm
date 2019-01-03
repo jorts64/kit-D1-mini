@@ -1,0 +1,45 @@
+<html>
+<head>
+  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+  <meta name='viewport' content='width=device-width'> 
+  <title>AJAX Test</title>
+  <style>
+    body {
+      background-color: Cornsilk;
+    }
+  </style>
+  <script src="visor.js"></script>
+</head>
+<body>
+<h1>Visor de fotos</h1>
+<div>
+<button onclick="anterior()">Anterior</button>
+<button onclick="seguent()">Següent</button>
+</div>
+<p id='nomf'></p>
+<canvas id="foto" width="120" height="120" style="border:1px solid #000000;">
+</canvas>
+<br/>
+<canvas id="escala" width="120" height="10" style="border:1px solid #000000;">
+</canvas>
+<p id='crues'></p>
+<p id='fecha'></p>
+<p id='hora'></p>
+<p id='tth'></p>
+<p id='rangt'></p>
+<p id='mintemp'></p>
+<p id='maxtemp'></p>
+<p id='tmin'></p>
+<p id='tmax'></p>
+<p id='test'></p>
+<p id='array'></p>
+<script>
+var arxius = getDir();
+//document.getElementById('test').innerHTML = arxius;
+fotonum = 0;
+var myVar = loadArray(arxius[fotonum]);
+
+</script>
+</body>
+</html>
+
