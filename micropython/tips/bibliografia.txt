@@ -1,0 +1,41 @@
+http://docs.micropython.org/en/latest/library/machine.Pin.html#machine.Pin.off
+relay: no reconoce metodos low o high. Usan on() y off()
+
+https://github.com/mcauser/micropython-dht12
+DHT12: llibreria
+
+https://github.com/joewez/MicroPythonEDC
+RTC: llibreria
+mled: llibreria
+adc: exemple
+servo: exemple
+
+
+https://micropython-on-wemos-d1-mini.readthedocs.io/en/latest/shields.html#
+oled: exemple
+1-button: exemple
+relay: exemple
+RGB: exemple
+
+https://github.com/curlyz/ir-remote-upython-esp32
+IR controller: funcions / exemple
+No funciona por ahora
+
+https://randomnerdtutorials.com/getting-started-micropython-esp32-esp8266/
+Instalació uPyCraft i firmware
+
+http://docs.micropython.org/en/latest/esp8266/quickref.html
+https://www.w3schools.com/python/python_for_loops.asp
+pwm: llenguatge
+
+https://github.com/joewez/MicroPythonEDC/blob/master/shields/ds18b20_shield.py
+ds18b20: exemple
+
+https://github.com/catdog2/mpy_bh1750fvi_esp8266
+bh1750fvi: llibreria
+No funciona
+
+https://github.com/joewez/MicroPythonEDC/blob/master/drivers/mpu6050.py
+GY-521: llibreria
+No funciona
+

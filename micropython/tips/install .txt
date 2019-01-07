@@ -1,0 +1,6 @@
+uPyCraft_linux_V1.0 es el ejecutable, se ha de mover a la carpeta micropython
+hay que instalar:
+sudo apt install python3-pyqt4
+sudo apt install topmenu-gtk2
+workSpace crea una carpeta workSpace, se ha de escoger la carpeta micropython
+
