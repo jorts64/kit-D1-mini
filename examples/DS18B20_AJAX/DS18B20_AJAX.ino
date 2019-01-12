@@ -4,8 +4,8 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-const char *ssid = "jortsnet";
-const char *password = "9periodico";
+const char *ssid = "nom de la xarxa";
+const char *password = "contrasenya";
 
 ESP8266WebServer server ( 80 );
 
@@ -68,19 +68,9 @@ void handleNotFound() {
 void handleAjax(){
   DS18B20.requestTemperatures(); 
   t = DS18B20.getTempCByIndex(0);
-  int t1,t2;
   Serial.print("Temperature: ");
   Serial.println(t);
-  String out = "";
-  char temp[100];
-  t1 = int(t);
-  snprintf(temp, 100, "%d", t1);
-  out += temp;
-  out += ".";
-  t2 = int((t+0.005)*100)-100*t1;
-  snprintf(temp, 100, "%d", t2);
-  out += temp;
-
+  String out = String(t);
   server.send ( 200, "text/txt", out);
 }
 
