@@ -1,0 +1,51 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width"> 
+	<title>Gauge Test</title>
+	<script src="gauge.js"></script>
+	<style>body{padding:0;margin:0;background:#000}</style>
+	
+	<script>
+	function DrawGauge() 
+	{
+		gauge = new Gauge({
+			renderTo  : 'gauge',
+			width       : document.body.clientWidth,
+			height      : document.body.clientHeight,
+			glow      : true,
+			units     : '',
+			title     : 'Count',
+			strokeTicks : false,
+			highlights : [{
+				from  : 40,
+				to    : 60,
+				color : 'PaleGreen'
+			}, {
+				from  : 60,
+				to    : 80,
+				color : 'Khaki'
+			}, {
+				from  : 80,
+				to    : 100,
+				color : 'LightSalmon'
+			}],
+			animation : {
+				delay : 10,
+				duration: 300,
+				fn : 'bounce'
+			}
+		});
+		gauge.draw();
+	};	
+	</script>
+	
+</head>
+<body>
+	<canvas id="gauge"></canvas>
+	<div id="console"></div>
+	<script>
+		DrawGauge();
+	</script>
+
+</html>
